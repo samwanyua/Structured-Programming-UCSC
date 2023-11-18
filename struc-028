@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s input_file\n", argv[0]);
+        return 1;
+    }
+
+    FILE *inputFile = fopen(argv[1], "r");
+    if (inputFile == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    
+    int size;
+    if (fscanf(inputFile, "%d", &size) != 1) {
+        fprintf(stderr, "Error reading array size from the file.\n");
+        fclose(inputFile);
+        return 1;
+    }
+
+    
+    int *data = (int *)malloc(size * sizeof(int));
+    if (data == NULL) {
+        fprintf(stderr, "Memory allocation error.\n");
+        fclose(inputFile);
+        return 1;
+    }
+
+    
+    for (int i = 0; i < size; i++) {
+        if (fscanf(inputFile, "%d", &data[i]) != 1) {
+            fprintf(stderr, "Error reading integer from the file.\n");
+            free(data);
+            fclose(inputFile);
+            return 1;
+        }
+    }
+
+    
+    fclose(inputFile);
+
+    
+    double average = 0.0;
+    int max = data[0];
+    for (int i = 0; i < size; i++) {
+        average += data[i];
+        if (data[i] > max) {
+            max = data[i];
+        }
+    }
+    average /= size;
+
+   
+    printf("Array values:\n");
+    for (int i = 0; i < size; i++) {
+        printf("%d ", data[i]);
+    }
+    printf("\n\n");
+
+    printf("Average: %.2f\n", average);
+    printf("Maximum: %d\n", max);
+
+    
+    FILE *outputFile = fopen("answer-hw3", "w");
+    if (outputFile == NULL) {
+        perror("Error opening output file");
+        free(data);
+        return 1;
+    }
+
+    
+    fprintf(outputFile, "Array values:\n");
+    for (int i = 0; i < size; i++) {
+        fprintf(outputFile, "%d ", data[i]);
+    }
+    fprintf(outputFile, "\n\n");
+
+    fprintf(outputFile, "Average: %.2f\n", average);
+    fprintf(outputFile, "Maximum: %d\n", max);
+
+    
+    fclose(outputFile);
+
+    
+    free(data);
+
+    return 0;
+}
